@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 from database import get_session
-from models.director import Director
+from models import Director
 
 router = APIRouter(prefix="/director", tags=["Directors"])
 
