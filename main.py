@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from database import create_db_and_tables
+from database.database import create_db_and_tables
 from routers import directorRouter
 
 async def lifespan(app: FastAPI):

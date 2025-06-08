@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 import os
 
 
-load_dotenv("db.env")
+load_dotenv("./database/db.env")
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 engine = create_engine(DATABASE_URL, echo=True)

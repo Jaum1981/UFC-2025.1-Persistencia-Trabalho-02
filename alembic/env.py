@@ -7,8 +7,8 @@ from sqlalchemy import pool
 from alembic import context
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from models.models import SQLModel  # use o caminho correto
-from database import DATABASE_URL
+from models.models import SQLModel
+from database.database import DATABASE_URL
 
 config = context.config
 if config.config_file_name is not None:

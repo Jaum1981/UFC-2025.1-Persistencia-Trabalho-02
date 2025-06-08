@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlmodel import Session, select
-from database import get_session
-from models import Director
+from database.database import get_session
+from models.models import Director
 from pydantic import BaseModel
 from typing import List
 from sqlalchemy import func
