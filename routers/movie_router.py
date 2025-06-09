@@ -80,7 +80,7 @@ def count_movies(
     return CountResponse(quantidade=total)
 
 @router.get("/{movie_id}", response_model=Movie)
-def get_movie(
+def get_movie_by_id(
     movie_id: int,
     session: Session = Depends(get_session)
 ):

@@ -95,7 +95,7 @@ class SessionCreateDTO(BaseModel):
     date_time: str
     exibition_type: str
     language_audio: str
-    language_subtitle: str | None = None
+    language_subtitles: str | None = None
     status_session: str
     room_id: Optional[int]
     movie_id: Optional[int]
@@ -110,7 +110,15 @@ class SessionUpdateDTO(BaseModel):
     date_time: str | None = None
     exibition_type: str | None = None
     language_audio: str | None = None
-    language_subtitle: str | None = None
+    language_subtitles: str | None = None
     status_session: str | None = None
     room_id: Optional[int] = None
     movie_id: Optional[int] = None
+
+    @field_validator('date_time')
+    def validate_date_time(cls, v):
+        if v is None:
+            return v
+        if not re.match(r'^\d{2}/\d{2}/\d{4} \d{2}:\d{2}$', v):
+            raise ValueError('date_time must be in DD/MM/YYYY HH:MM format')
+        return v
