@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-from database import create_db_and_tables
-from routers import directorRouter
+from database.database import create_db_and_tables
+from routers import director_router, movie_router, room_router
 
 
 app = FastAPI()
@@ -13,4 +13,6 @@ def on_startup():
 def home():
     return {"message": "oi"}
 
-app.include_router(directorRouter.router)
+app.include_router(director_router.router)
+app.include_router(movie_router.router)
+app.include_router(room_router.router)
