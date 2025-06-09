@@ -122,3 +122,32 @@ class SessionUpdateDTO(BaseModel):
         if not re.match(r'^\d{2}/\d{2}/\d{4} \d{2}:\d{2}$', v):
             raise ValueError('date_time must be in DD/MM/YYYY HH:MM format')
         return v
+    
+class PaymentCreateDTO(BaseModel):
+    payment_id: int | None = None
+    transaction_id: str
+    payment_method: str
+    final_price: float
+    status: str
+    payment_date: str
+    ticket_id: Optional[int] = None
+
+    @field_validator('payment_date')
+    def validate_payment_date(cls, v):
+        if not re.match(r'^\d{2}/\d{2}/\d{4} \d{2}:\d{2}$', v):
+            raise ValueError('payment_date must be in DD/MM/YYYY HH:MM format')
+        return v
+    
+class PaymentUpdateDTO(BaseModel):
+    transaction_id: str | None = None
+    payment_method: str | None = None
+    final_price: float | None = None
+    status: str | None = None
+    payment_date: str | None = None
+    ticket_id: Optional[int] = None
+
+    @field_validator('payment_date')
+    def validate_payment_date(cls, v):
+        if v is not None and not re.match(r'^\d{2}/\d{2}/\d{4} \d{2}:\d{2}$', v):
+            raise ValueError('payment_date must be in DD/MM/YYYY HH:MM format')
+        return v

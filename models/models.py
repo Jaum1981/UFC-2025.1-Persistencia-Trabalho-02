@@ -31,7 +31,6 @@ class Director(SQLModel, table=True):
     #Filmes n:n Diretores
     movies: list["Movie"] = Relationship(back_populates="directors", link_model=MovieDirectorLink) 
 
-
 class PaymentDetails(SQLModel, table=True):
     payment_id: Optional[int] = Field(default=None, primary_key=True)
     transaction_id: str
