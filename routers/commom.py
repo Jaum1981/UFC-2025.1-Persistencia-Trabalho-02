@@ -151,3 +151,33 @@ class PaymentUpdateDTO(BaseModel):
         if v is not None and not re.match(r'^\d{2}/\d{2}/\d{4} \d{2}:\d{2}$', v):
             raise ValueError('payment_date must be in DD/MM/YYYY HH:MM format')
         return v
+    
+class TickerCreateDTO(BaseModel):
+    ticket_id: int | None = None
+    chair_number: int
+    ticket_type: str
+    ticket_price: float
+    purchase_date: str
+    payment_status: str
+    session_id: Optional[int] = None
+
+    @field_validator('purchase_date')
+    def validate_purchase_date(cls, v):
+        if not re.match(r'^\d{2}/\d{2}/\d{4} \d{2}:\d{2}$', v):
+            raise ValueError('purchase_date must be in DD/MM/YYYY HH:MM format')
+        return v
+    
+class TicketUpdateDTO(BaseModel):
+    chair_number: int | None = None
+    ticket_type: str | None = None
+    ticket_price: float | None = None
+    purchase_date: str | None = None
+    payment_status: str | None = None
+    session_id: Optional[int] = None
+    @field_validator('purchase_date')
+    def validate_purchase_date(cls, v):
+        if v is None:
+            return v
+        if v is not None and not re.match(r'^\d{2}/\d{2}/\d{4} \d{2}:\d{2}$', v):
+            raise ValueError('purchase_date must be in DD/MM/YYYY HH:MM format')
+        return v

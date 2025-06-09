@@ -31,7 +31,7 @@ def create_payment(
     data = paymentDto.model_dump(exclude_none=True)
     if "payment_date" in data:
         data["payment_date"] = datetime.strptime(data["payment_date"], "%d/%m/%Y %H:%M")
-    new_payment = PaymentDetails(**paymentDto.model_dump(exclude_none=True))
+    new_payment = PaymentDetails(**data)
     session.add(new_payment)
     try:
         session.commit()
@@ -70,7 +70,7 @@ def filter_payments(
     if status:
         query = query.where(PaymentDetails.status == status)
 
-    total = session.exec(query).count()
+    total = session.exec(select(func.count()).select_from(query.subquery())).one()
     total_pages = math.ceil(total / per_page)
     offset = (page - 1) * per_page
 
