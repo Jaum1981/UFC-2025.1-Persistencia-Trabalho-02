@@ -7,6 +7,7 @@ from sqlalchemy.exc import IntegrityError
 from typing import Optional, List
 
 from models.models import Session as SessionModel
+from models.models import Movie, Room
 from database.database import get_session
 from routers.commom import (
     PaginationMeta, 

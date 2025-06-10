@@ -31,7 +31,7 @@ def create_ticket(
     data = ticketDto.model_dump(exclude_none=True)
     if "purchase_date" in data:
         data["purchase_date"] = datetime.strptime(data["purchase_date"], "%d/%m/%Y %H:%M")
-        new_ticket = Ticket(**ticketDto.model_dump(exclude_none=True))
+        new_ticket = Ticket(**data)
         session.add(new_ticket)
         try:
             session.commit()

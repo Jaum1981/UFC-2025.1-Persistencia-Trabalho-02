@@ -22,7 +22,7 @@ class DeleteResponse(BaseModel):
     message: str
 
 class DirectorCreateDTO(BaseModel):
-    director_id: int | None = None
+    director_id: Optional[int]
     director_name: str
     nationality: str
     birth_date: str
@@ -61,7 +61,7 @@ class DirectorUpdateDTO(BaseModel):
         return v
     
 class MovieCreateDTO(BaseModel):
-    movie_id: int | None = None
+    movie_id: Optional[int]
     movie_title: str
     genre: str
     duration: int
@@ -76,7 +76,7 @@ class MovieUpdateDTO(BaseModel):
     synopsis: str | None = None
 
 class RoomCreateDTO(BaseModel):
-    room_id: int | None = None
+    room_id: Optional[int]
     room_name: str
     capacity: int
     screen_type: str
@@ -91,7 +91,7 @@ class RoomUpdateDTO(BaseModel):
     acessibility: bool | None = None
 
 class SessionCreateDTO(BaseModel):
-    session_id: int | None = None
+    session_id: Optional[int]
     date_time: str
     exibition_type: str
     language_audio: str
@@ -124,7 +124,7 @@ class SessionUpdateDTO(BaseModel):
         return v
     
 class PaymentCreateDTO(BaseModel):
-    payment_id: int | None = None
+    payment_id: Optional[int]
     transaction_id: str
     payment_method: str
     final_price: float
@@ -153,7 +153,7 @@ class PaymentUpdateDTO(BaseModel):
         return v
     
 class TickerCreateDTO(BaseModel):
-    ticket_id: int | None = None
+    ticket_id: Optional[int]
     chair_number: int
     ticket_type: str
     ticket_price: float
@@ -181,3 +181,10 @@ class TicketUpdateDTO(BaseModel):
         if v is not None and not re.match(r'^\d{2}/\d{2}/\d{4} \d{2}:\d{2}$', v):
             raise ValueError('purchase_date must be in DD/MM/YYYY HH:MM format')
         return v
+    
+
+class MovieReport(BaseModel):
+    movie_id: int
+    movie_title: str
+    total_revenue: float
+    tickets_sold: int
