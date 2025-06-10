@@ -7,7 +7,7 @@ from typing import Optional, List
 
 from models.models import Movie
 from database.database import get_session
-from routers.commom import (
+from routers.common import (
     PaginationMeta, 
     ListResponseMeta, 
     CountResponse, 
@@ -16,7 +16,7 @@ from routers.commom import (
     MovieUpdateDTO
 )
 
-router = APIRouter(prefix="/movie", tags=["Movies"])
+router = APIRouter(prefix="/movies", tags=["Movies"])
 
 @router.post("", response_model=Movie)
 def create_movie(
@@ -70,7 +70,7 @@ def filter_movies(
         remaining=remaining,
     )
 
-    return ListResponseMeta(data=movies, meta=meta)
+    return ListResponseMeta[Movie](data=movies, meta=meta)
 
 @router.get("/count", response_model=CountResponse)
 def count_movies(
