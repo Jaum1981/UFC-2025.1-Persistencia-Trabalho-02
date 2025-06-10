@@ -7,7 +7,7 @@ from typing import Optional, List
 
 from models.models import Room
 from database.database import get_session
-from routers.commom import (
+from routers.common import (
     PaginationMeta, 
     ListResponseMeta, 
     CountResponse, 
@@ -16,7 +16,7 @@ from routers.commom import (
     RoomUpdateDTO
 )
 
-router = APIRouter(prefix="/room", tags=["Rooms"])
+router = APIRouter(prefix="/rooms", tags=["Rooms"])
 
 @router.post("", response_model=Room)
 def create_room(

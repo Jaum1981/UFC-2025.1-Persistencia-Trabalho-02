@@ -7,7 +7,7 @@ from typing import Optional, List
 
 from models.models import Director
 from database.database import get_session
-from routers.commom import (
+from routers.common import (
     PaginationMeta,
     ListResponseMeta,
     CountResponse,
@@ -16,7 +16,7 @@ from routers.commom import (
     DirectorUpdateDTO
 )
 
-router = APIRouter(prefix="/director", tags=["Directors"])
+router = APIRouter(prefix="/directors", tags=["Directors"])
 
 @router.post("", response_model=Director)
 def create_director(
@@ -70,7 +70,7 @@ def filter_directors(
         remaining=remaining,
     )
 
-    return ListResponseMeta(data=directors, meta=meta)
+    return ListResponseMeta[Director](data=directors, meta=meta)
 
 
 @router.get("/count", response_model=CountResponse)

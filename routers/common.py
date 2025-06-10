@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 from pydantic import BaseModel, field_validator
 from typing import Generic, TypeVar, List, Optional
 
@@ -92,7 +93,7 @@ class RoomUpdateDTO(BaseModel):
 
 class SessionCreateDTO(BaseModel):
     session_id: Optional[int]
-    date_time: str
+    date_time: datetime
     exibition_type: str
     language_audio: str
     language_subtitles: str | None = None
@@ -100,11 +101,11 @@ class SessionCreateDTO(BaseModel):
     room_id: Optional[int]
     movie_id: Optional[int]
 
-    @field_validator('date_time')
-    def validate_date_time(cls, v):
-        if not re.match(r'^\d{2}/\d{2}/\d{4} \d{2}:\d{2}$', v):
-            raise ValueError('date_time must be in DD/MM/YYYY HH:MM format')
-        return v
+    # @field_validator('date_time')
+    # def validate_date_time(cls, v):
+    #     if not re.match(r'^\d{2}/\d{2}/\d{4} \d{2}:\d{2}$', v):
+    #         raise ValueError('date_time must be in DD/MM/YYYY HH:MM format')
+    #     return v
     
 class SessionUpdateDTO(BaseModel):
     date_time: str | None = None
@@ -129,14 +130,14 @@ class PaymentCreateDTO(BaseModel):
     payment_method: str
     final_price: float
     status: str
-    payment_date: str
+    payment_date: datetime
     ticket_id: Optional[int] = None
 
-    @field_validator('payment_date')
-    def validate_payment_date(cls, v):
-        if not re.match(r'^\d{2}/\d{2}/\d{4} \d{2}:\d{2}$', v):
-            raise ValueError('payment_date must be in DD/MM/YYYY HH:MM format')
-        return v
+    # @field_validator('payment_date')
+    # def validate_payment_date(cls, v):
+    #     if not re.match(r'^\d{2}/\d{2}/\d{4} \d{2}:\d{2}$', v):
+    #         raise ValueError('payment_date must be in DD/MM/YYYY HH:MM format')
+    #     return v
     
 class PaymentUpdateDTO(BaseModel):
     transaction_id: str | None = None
@@ -157,15 +158,15 @@ class TickerCreateDTO(BaseModel):
     chair_number: int
     ticket_type: str
     ticket_price: float
-    purchase_date: str
+    purchase_date: datetime
     payment_status: str
     session_id: Optional[int] = None
 
-    @field_validator('purchase_date')
-    def validate_purchase_date(cls, v):
-        if not re.match(r'^\d{2}/\d{2}/\d{4} \d{2}:\d{2}$', v):
-            raise ValueError('purchase_date must be in DD/MM/YYYY HH:MM format')
-        return v
+    # @field_validator('purchase_date')
+    # def validate_purchase_date(cls, v):
+    #     if not re.match(r'^\d{2}/\d{2}/\d{4} \d{2}:\d{2}$', v):
+    #         raise ValueError('purchase_date must be in DD/MM/YYYY HH:MM format')
+    #     return v
     
 class TicketUpdateDTO(BaseModel):
     chair_number: int | None = None

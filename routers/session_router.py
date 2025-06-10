@@ -9,7 +9,7 @@ from typing import Optional, List
 from models.models import Session as SessionModel
 from models.models import Movie, Room
 from database.database import get_session
-from routers.commom import (
+from routers.common import (
     PaginationMeta, 
     ListResponseMeta, 
     CountResponse, 
@@ -18,31 +18,27 @@ from routers.commom import (
     SessionUpdateDTO
 )
 
-router = APIRouter(prefix="/session", tags=["Sessions"])
+router = APIRouter(prefix="/sessions", tags=["Sessions"])
 
 @router.post("", response_model=SessionModel)
 def create_session(
     sessionDto: SessionCreateDTO,
     session: Session = Depends(get_session)
 ):
-    if sessionDto.session_id is not None:
-        existing = session.get(SessionModel, sessionDto.session_id)
-        if existing:
-            raise HTTPException(status_code=409, detail="Session with ID already exists")
+    if sessionDto.session_id is not None and session.get(SessionModel, sessionDto.session_id):
+        raise HTTPException(status_code=409, detail="Session with ID already exists")
     data = sessionDto.model_dump(exclude_none=True)
-    data["date_time"] = datetime.strptime(data["date_time"], "%d/%m/%Y %H:%M")
     new_session = SessionModel(**data)
     session.add(new_session)
     try:
         session.commit()
+        session.refresh(new_session)
     except IntegrityError:
         session.rollback()
         raise HTTPException(
             status_code=400,
             detail="room_id ou movie_id não existem"
         )
-    session.commit()
-    session.refresh(new_session)
     return new_session
 
 @router.get("", response_model=List[SessionModel])
@@ -55,15 +51,18 @@ def filter_sessions(
     session: Session = Depends(get_session),
     page: int = Query(1, ge=1, description="Page number, starting from 1"),
     per_page: int = Query(10, ge=1, le=100, description="Items per page"),
-    date_time: Optional[str] = Query(None, description="Filter by session date and time"),
+    after: Optional[datetime] = Query(None, description="Sessions from"),
+    before: Optional[datetime] = Query(None, description="Sessions until"),
     status_session: Optional[str] = Query(None, description="Filter by session status"),
     room_id: Optional[int] = Query(None, description="Filter by room ID"),
     movie_id: Optional[int] = Query(None, description="Filter by movie ID")
 ):
     query = select(SessionModel)
 
-    if date_time:
-        query = query.where(SessionModel.date_time.ilike(f'%{date_time}%'))
+    if after:
+        query = query.where(SessionModel.date_time >= after)
+    if before:
+        query = query.where(SessionModel.date_time <= before)
 
     if status_session:
         query = query.where(SessionModel.status_session == status_session)

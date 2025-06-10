@@ -8,12 +8,12 @@ from typing import Optional, List
 
 from models.models import Ticket
 from database.database import get_session
-from routers.commom import (
+from routers.common import (
     PaginationMeta, 
     ListResponseMeta, 
     CountResponse, 
     DeleteResponse,
-    TickerCreateDTO,
+    TicketCreateDTO,
     TicketUpdateDTO
 )
 
@@ -21,29 +21,23 @@ router = APIRouter(prefix="/tickets", tags=["Tickets"])
 
 @router.post("", response_model=Ticket)
 def create_ticket(
-    ticketDto: TickerCreateDTO,
+    ticketDto: TicketCreateDTO,
     session: Session = Depends(get_session)
 ):
-    if ticketDto.ticket_id is not None:
-        existing = session.get(Ticket, ticketDto.ticket_id)
-        if existing:
-            raise HTTPException(status_code=409, detail="Ticket with ID already exists")
-    data = ticketDto.model_dump(exclude_none=True)
-    if "purchase_date" in data:
-        data["purchase_date"] = datetime.strptime(data["purchase_date"], "%d/%m/%Y %H:%M")
-        new_ticket = Ticket(**data)
-        session.add(new_ticket)
-        try:
-            session.commit()
-        except IntegrityError:
-            session.rollback()
-            raise HTTPException(
-                status_code=400,
-                detail="session_id does not exist"
-                )
+    if ticketDto.ticket_id is not None and session.get(Ticket, ticketDto.ticket_id):
+        raise HTTPException(status_code=409, detail="Ticket with ID already exists")
+    new_ticket = Ticket(**ticketDto.model_dump(exclude_none=True))
+    session.add(new_ticket)
+    try:
         session.commit()
-        session.refresh(new_ticket)
-        return new_ticket
+    except IntegrityError:
+        session.rollback()
+        raise HTTPException(
+            status_code=400,
+            detail="session_id does not exist"
+            )
+    session.refresh(new_ticket)
+    return new_ticket
     
 @router.get("", response_model=List[Ticket])
 def list_all_tickets(session: Session = Depends(get_session)):
@@ -97,7 +91,7 @@ def filter_tickets(
 def count_tickets(
     session: Session = Depends(get_session)
 ):
-    total = session.exec(select(func.count(Ticket.ticket_id))).one
+    total = session.exec(select(func.count(Ticket.ticket_id))).one()
     return CountResponse(quantidade=total)
 
 @router.get("/{ticket_id}", response_model=Ticket)
@@ -110,7 +104,7 @@ def get_ticket_by_id(
         raise HTTPException(status_code=404, detail="Ticket not found")
     return ticket
 
-@router.put("{ticket_id}", response_model=Ticket)
+@router.put("/{ticket_id}", response_model=Ticket)
 def update_ticket(
     ticket_id: int,
     tickeDto: TicketUpdateDTO,

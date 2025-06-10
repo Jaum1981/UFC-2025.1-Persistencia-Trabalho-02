@@ -8,7 +8,7 @@ from typing import Optional, List
 
 from models.models import PaymentDetails
 from database.database import get_session
-from routers.commom import (
+from routers.common import (
     PaginationMeta, 
     ListResponseMeta, 
     CountResponse, 
@@ -17,20 +17,16 @@ from routers.commom import (
     PaymentUpdateDTO,
 )
 
-router = APIRouter(prefix="/payment", tags=["Payments"])
+router = APIRouter(prefix="/payments", tags=["Payments"])
 
 @router.post("", response_model=PaymentDetails)
 def create_payment(
     paymentDto: PaymentCreateDTO,
     session: Session = Depends(get_session)
 ):
-    if paymentDto.payment_id is not None:
-        existing = session.get(PaymentDetails, paymentDto.payment_id)
-        if existing:
-            raise HTTPException(status_code=409, detail="Payment with ID already exists")
+    if paymentDto.payment_id is not None and  session.get(PaymentDetails, paymentDto.payment_id):
+        raise HTTPException(status_code=409, detail="Payment with ID already exists")
     data = paymentDto.model_dump(exclude_none=True)
-    if "payment_date" in data:
-        data["payment_date"] = datetime.strptime(data["payment_date"], "%d/%m/%Y %H:%M")
     new_payment = PaymentDetails(**data)
     session.add(new_payment)
     try:
@@ -41,7 +37,6 @@ def create_payment(
             status_code=400,
             detail="ticket_id does not exist"
         )
-    session.commit()
     session.refresh(new_payment)
     return new_payment
 
