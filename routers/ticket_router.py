@@ -130,8 +130,7 @@ def update_ticket(
         raise HTTPException(status_code=404, detail="Ticket not found")
     
     update_data = tickeDto.model_dump(exclude_none=True)
-    if "purchase_date" in update_data:
-        update_data["purchase_date"] = datetime.strftime(update_data["purchase_date"], "%d/%m/%Y %H:%M")
+
     for key, value in update_data.items():
         setattr(ticket, key, value)
     session.add(ticket)
