@@ -3,6 +3,7 @@ from typing import Optional
 from datetime import datetime
 
 class MovieDirectorLink(SQLModel, table=True):
+    __tablename__ = "movie_director_link"
     movie_id: Optional[int] = Field(default=None, foreign_key="movie.movie_id", primary_key=True)
     director_id: Optional[int] = Field(default=None, foreign_key="director.director_id", primary_key=True)
 

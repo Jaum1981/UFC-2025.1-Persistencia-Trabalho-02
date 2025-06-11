@@ -56,6 +56,7 @@ class MovieCreateDTO(BaseModel):
     duration: int
     rating: str
     synopsis: str
+    release_year: Optional[int]
     
 class MovieUpdateDTO(BaseModel):
     movie_title: str | None = None
