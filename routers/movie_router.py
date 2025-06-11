@@ -15,7 +15,8 @@ from routers.common import (
     CountResponse, 
     DeleteResponse, 
     MovieCreateDTO, 
-    MovieUpdateDTO
+    MovieUpdateDTO,
+    MovieRead
 )
 
 router = APIRouter(prefix="/movies", tags=["Movies"])
@@ -45,7 +46,7 @@ def create_movie(
     logger.info(f'[create_movie] Movie created successfully!')
     return movie
 
-@router.get("", response_model=List[Movie])
+@router.get("", response_model=List[MovieRead])
 def list_all_movies(session: Session = Depends(get_session)):
     logger.info(f'[list_all_movies] Listing movies...')
     movies = session.exec(
@@ -54,7 +55,7 @@ def list_all_movies(session: Session = Depends(get_session)):
     logger.info(f'[list_all_movies] {len(movies)} found.')
     return movies
 
-@router.get("/filter", response_model=ListResponseMeta[Movie])
+@router.get("/filter", response_model=ListResponseMeta[MovieRead])
 def filter_movies(
     session: Session = Depends(get_session),
     page: int = Query(1, ge=1, description="Page number, starting from 1"),
@@ -63,7 +64,7 @@ def filter_movies(
     genre: Optional[str] = Query(None, description="Filter by genre")
 ):
     logger.info(f'[filter_movies] Filtering movies...')
-    query = select(Movie)
+    query = select(Movie).options(selectinload(Movie.directors))
 
     if title_contains:
         query = query.where(Movie.movie_title.ilike(f'%{title_contains}%'))
@@ -99,7 +100,7 @@ def count_movies(
     logger.info(f'[count_movies] Total movies: {total}.')
     return CountResponse(quantidade=total)
 
-@router.get("/{movie_id}", response_model=Movie)
+@router.get("/{movie_id}", response_model=MovieRead)
 def get_movie_by_id(
     movie_id: int,
     session: Session = Depends(get_session)
@@ -150,25 +151,25 @@ def delete_movie(
     return DeleteResponse(message="Movie deleted successfully")
 
 
-@router.post("/{movie_id}/directors/{director_id}", status_code=201, response_model=Movie)
-def add_director_to_movie(
-    movie_id: int,
-    director_id: int,
-    session: Session = Depends(get_session)
-):
-    movie = session.get(Movie, movie_id)
-    if not movie:
-        raise HTTPException(status_code=404, detail="Movie not found")
+# @router.post("/{movie_id}/directors/{director_id}", status_code=201, response_model=Movie)
+# def add_director_to_movie(
+#     movie_id: int,
+#     director_id: int,
+#     session: Session = Depends(get_session)
+# ):
+#     movie = session.get(Movie, movie_id)
+#     if not movie:
+#         raise HTTPException(status_code=404, detail="Movie not found")
 
-    director = session.get(Director, director_id)
-    if not director:
-        raise HTTPException(status_code=404, detail="Director not found")
+#     director = session.get(Director, director_id)
+#     if not director:
+#         raise HTTPException(status_code=404, detail="Director not found")
 
-    # Adiciona o diretor à lista de diretores do filme (se já não estiver lá)
-    if director not in movie.directors:
-        movie.directors.append(director)
-        session.add(movie)
-        session.commit()
-        session.refresh(movie)
+#     # Adiciona o diretor à lista de diretores do filme (se já não estiver lá)
+#     if director not in movie.directors:
+#         movie.directors.append(director)
+#         session.add(movie)
+#         session.commit()
+#         session.refresh(movie)
 
-    return movie
+#     return movie

@@ -150,3 +150,28 @@ class MovieReport(BaseModel):
     movie_title: str
     total_revenue: float
     tickets_sold: int
+
+
+class DirectorRead(BaseModel):
+    director_id: int
+    director_name: str
+    nationality: str
+    birth_date: datetime
+    biography: str
+    website: str
+
+    class Config:
+        orm_mode = True
+        
+class MovieRead(BaseModel):
+    movie_id: int
+    movie_title: str
+    genre: str
+    duration: int
+    rating: str
+    synopsis: str
+    release_year: Optional[int] = None
+    directors: List[DirectorRead] = []
+
+    class Config:
+        orm_mode = True
