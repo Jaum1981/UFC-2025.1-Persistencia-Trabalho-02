@@ -13,6 +13,7 @@ class Movie(SQLModel, table = True):
     duration: int
     rating: str
     synopsis: str
+    release_year: Optional[int] = Field(default=None)
 
     #Filmes n:n Diretores
     directors: list["Director"] = Relationship(back_populates="movies", link_model=MovieDirectorLink)
