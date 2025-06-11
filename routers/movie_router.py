@@ -151,25 +151,25 @@ def delete_movie(
     return DeleteResponse(message="Movie deleted successfully")
 
 
-# @router.post("/{movie_id}/directors/{director_id}", status_code=201, response_model=Movie)
-# def add_director_to_movie(
-#     movie_id: int,
-#     director_id: int,
-#     session: Session = Depends(get_session)
-# ):
-#     movie = session.get(Movie, movie_id)
-#     if not movie:
-#         raise HTTPException(status_code=404, detail="Movie not found")
+@router.post("/{movie_id}/directors/{director_id}", status_code=201, response_model=Movie)
+def add_director_to_movie(
+    movie_id: int,
+    director_id: int,
+    session: Session = Depends(get_session)
+):
+    movie = session.get(Movie, movie_id)
+    if not movie:
+        raise HTTPException(status_code=404, detail="Movie not found")
 
-#     director = session.get(Director, director_id)
-#     if not director:
-#         raise HTTPException(status_code=404, detail="Director not found")
+    director = session.get(Director, director_id)
+    if not director:
+        raise HTTPException(status_code=404, detail="Director not found")
 
-#     # Adiciona o diretor à lista de diretores do filme (se já não estiver lá)
-#     if director not in movie.directors:
-#         movie.directors.append(director)
-#         session.add(movie)
-#         session.commit()
-#         session.refresh(movie)
+    # Adiciona o diretor à lista de diretores do filme (se já não estiver lá)
+    if director not in movie.directors:
+        movie.directors.append(director)
+        session.add(movie)
+        session.commit()
+        session.refresh(movie)
 
-#     return movie
+    return movie

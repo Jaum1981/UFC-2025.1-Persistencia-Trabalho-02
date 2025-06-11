@@ -12,8 +12,10 @@ from routers.common import MovieReport, ListResponseMeta, SessionSummary, Pagina
 router = APIRouter(prefix="/reports", tags=["Reports"])
 
 @router.get("/movie-revenue", response_model=List[MovieReport], summary="Gera um relatório de receita por filme")
-async def get_movie_revenue_report(session: Session = Depends(get_session)):
-    query = (
+async def get_movie_revenue_report(order:bool, session: Session = Depends(get_session)):
+    
+    if order is True:
+        query = (
         select(
             Movie.movie_id,
             Movie.movie_title,
@@ -25,6 +27,19 @@ async def get_movie_revenue_report(session: Session = Depends(get_session)):
         .group_by(Movie.movie_id, Movie.movie_title)
         .order_by(func.sum(Ticket.ticket_price).desc())
     )
+    else:
+        query = (
+            select(
+                Movie.movie_id,
+                Movie.movie_title,
+                func.sum(Ticket.ticket_price).label("total_revenue"),
+                func.count(Ticket.ticket_id).label("tickets_sold")
+            )
+            .join(SessionModel, Movie.movie_id == SessionModel.movie_id)
+            .join(Ticket, SessionModel.session_id == Ticket.session_id)
+            .group_by(Movie.movie_id, Movie.movie_title)
+            .order_by(func.sum(Ticket.ticket_price).asc())
+        )
     
     results = session.exec(query).all()
     
