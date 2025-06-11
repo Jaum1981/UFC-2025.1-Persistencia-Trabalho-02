@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 from pydantic import BaseModel, field_validator
 from typing import Generic, TypeVar, List, Optional
 
@@ -25,16 +26,10 @@ class DirectorCreateDTO(BaseModel):
     director_id: Optional[int]
     director_name: str
     nationality: str
-    birth_date: str
+    birth_date: datetime
     biography: str
     website: str
 
-    @field_validator('birth_date')
-    def validate_birth_date(cls, v):
-        if not re.match(r'^\d{2}/\d{2}/\d{4}$', v):
-            raise ValueError('birth_date must be DD/MM/YYYY')
-        return v
-    
     @field_validator('website')
     def validate_website(cls, v):
         if not (v.startswith('http://') or v.startswith('https://')):
@@ -44,15 +39,9 @@ class DirectorCreateDTO(BaseModel):
 class DirectorUpdateDTO(BaseModel):
     director_name: str | None = None
     nationality: str | None = None
-    birth_date: str | None = None
+    birth_date: datetime | None = None
     biography: str | None = None
     website: str | None = None
-    
-    @field_validator('birth_date')
-    def validate_birth_date(cls, v):
-        if not re.match(r'^\d{2}/\d{2}/\d{4}$', v):
-            raise ValueError('birth_date must be DD/MM/YYYY')
-        return v
     
     @field_validator('website')
     def validate_website(cls, v):
@@ -67,6 +56,7 @@ class MovieCreateDTO(BaseModel):
     duration: int
     rating: str
     synopsis: str
+    release_year: Optional[int]
     
 class MovieUpdateDTO(BaseModel):
     movie_title: str | None = None
@@ -92,36 +82,22 @@ class RoomUpdateDTO(BaseModel):
 
 class SessionCreateDTO(BaseModel):
     session_id: Optional[int]
-    date_time: str
+    date_time: datetime
     exibition_type: str
     language_audio: str
     language_subtitles: str | None = None
     status_session: str
     room_id: Optional[int]
     movie_id: Optional[int]
-
-    @field_validator('date_time')
-    def validate_date_time(cls, v):
-        if not re.match(r'^\d{2}/\d{2}/\d{4} \d{2}:\d{2}$', v):
-            raise ValueError('date_time must be in DD/MM/YYYY HH:MM format')
-        return v
     
 class SessionUpdateDTO(BaseModel):
-    date_time: str | None = None
+    date_time: datetime | None = None
     exibition_type: str | None = None
     language_audio: str | None = None
     language_subtitles: str | None = None
     status_session: str | None = None
     room_id: Optional[int] = None
     movie_id: Optional[int] = None
-
-    @field_validator('date_time')
-    def validate_date_time(cls, v):
-        if v is None:
-            return v
-        if not re.match(r'^\d{2}/\d{2}/\d{4} \d{2}:\d{2}$', v):
-            raise ValueError('date_time must be in DD/MM/YYYY HH:MM format')
-        return v
     
 class PaymentCreateDTO(BaseModel):
     payment_id: Optional[int]
@@ -129,59 +105,43 @@ class PaymentCreateDTO(BaseModel):
     payment_method: str
     final_price: float
     status: str
-    payment_date: str
+    payment_date: datetime
     ticket_id: Optional[int] = None
-
-    @field_validator('payment_date')
-    def validate_payment_date(cls, v):
-        if not re.match(r'^\d{2}/\d{2}/\d{4} \d{2}:\d{2}$', v):
-            raise ValueError('payment_date must be in DD/MM/YYYY HH:MM format')
-        return v
     
 class PaymentUpdateDTO(BaseModel):
     transaction_id: str | None = None
     payment_method: str | None = None
     final_price: float | None = None
     status: str | None = None
-    payment_date: str | None = None
+    payment_date: datetime | None = None
     ticket_id: Optional[int] = None
-
-    @field_validator('payment_date')
-    def validate_payment_date(cls, v):
-        if v is not None and not re.match(r'^\d{2}/\d{2}/\d{4} \d{2}:\d{2}$', v):
-            raise ValueError('payment_date must be in DD/MM/YYYY HH:MM format')
-        return v
     
-class TickerCreateDTO(BaseModel):
+class TicketCreateDTO(BaseModel):
     ticket_id: Optional[int]
     chair_number: int
     ticket_type: str
     ticket_price: float
-    purchase_date: str
+    purchase_date: datetime
     payment_status: str
     session_id: Optional[int] = None
-
-    @field_validator('purchase_date')
-    def validate_purchase_date(cls, v):
-        if not re.match(r'^\d{2}/\d{2}/\d{4} \d{2}:\d{2}$', v):
-            raise ValueError('purchase_date must be in DD/MM/YYYY HH:MM format')
-        return v
     
 class TicketUpdateDTO(BaseModel):
     chair_number: int | None = None
     ticket_type: str | None = None
     ticket_price: float | None = None
-    purchase_date: str | None = None
+    purchase_date: datetime | None = None
     payment_status: str | None = None
     session_id: Optional[int] = None
-    @field_validator('purchase_date')
-    def validate_purchase_date(cls, v):
-        if v is None:
-            return v
-        if v is not None and not re.match(r'^\d{2}/\d{2}/\d{4} \d{2}:\d{2}$', v):
-            raise ValueError('purchase_date must be in DD/MM/YYYY HH:MM format')
-        return v
-    
+
+class SessionSummary(BaseModel):
+    session_id: int
+    date_time: datetime
+    exibition_type: str
+    language_audio: str
+    language_subtitles: Optional[str]
+    status_session: str
+    tickets_sold: int
+    revenue: float
 
 class MovieReport(BaseModel):
     movie_id: int
