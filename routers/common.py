@@ -153,7 +153,7 @@ class PaymentUpdateDTO(BaseModel):
             raise ValueError('payment_date must be in DD/MM/YYYY HH:MM format')
         return v
     
-class TickerCreateDTO(BaseModel):
+class TicketCreateDTO(BaseModel):
     ticket_id: Optional[int]
     chair_number: int
     ticket_type: str
@@ -182,7 +182,16 @@ class TicketUpdateDTO(BaseModel):
         if v is not None and not re.match(r'^\d{2}/\d{2}/\d{4} \d{2}:\d{2}$', v):
             raise ValueError('purchase_date must be in DD/MM/YYYY HH:MM format')
         return v
-    
+
+class SessionSummary(BaseModel):
+    session_id: int
+    date_time: datetime
+    exibition_type: str
+    language_audio: str
+    language_subtitles: Optional[str]
+    status_session: str
+    tickets_sold: int
+    revenue: float
 
 class MovieReport(BaseModel):
     movie_id: int
