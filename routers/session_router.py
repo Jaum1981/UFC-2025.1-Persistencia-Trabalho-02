@@ -132,8 +132,6 @@ def update_session(
         raise HTTPException(status_code=404, detail="Session not found")
     
     update_data = sessionDto.model_dump(exclude_none=True)
-    if "date_time" in update_data and update_data["date_time"] is not None:
-        update_data["date_time"] = datetime.strptime(update_data["date_time"], "%d/%m/%Y %H:%M")
 
     for key, value in update_data.items():
         setattr(existing_session, key, value)

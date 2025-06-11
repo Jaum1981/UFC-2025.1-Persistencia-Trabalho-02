@@ -126,8 +126,6 @@ def update_payment(
         raise HTTPException(status_code=404, detail="Payment not found")
 
     update_data = paymentDto.model_dump(exclude_none=True)
-    if "payment_date" in update_data:
-        update_data["payment_date"] = datetime.strptime(update_data["payment_date"], "%d/%m/%Y %H:%M")
     for key, value in update_data.items():
         setattr(payment, key, value)
     session.add(payment)
