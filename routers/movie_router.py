@@ -4,9 +4,10 @@ from core.logging import logger
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlmodel import Session, select
 from sqlalchemy import func
+from sqlalchemy.orm import selectinload
 from typing import Optional, List
 
-from models.models import Movie
+from models.models import Movie, Director
 from database.database import get_session
 from routers.common import (
     PaginationMeta, 
@@ -24,11 +25,20 @@ def create_movie(
     movieDto: MovieCreateDTO,
     session: Session = Depends(get_session)
 ):
-    logger.info(f'[create_movie] Creating movie {movieDto.movie_id}...')
-    if movieDto.movie_id is not None and session.get(Movie, movieDto.movie_id):
-        logger.error(f'[create_movie] A movie with id {movieDto.movie_id} already exists')
-        raise HTTPException(status_code=409, detail="Movie with ID already exists")
-    movie = Movie(**movieDto.model_dump(exclude_none=True))
+    logger.info(f'[create_movie] Creating movie {movieDto.movie_title}...')
+    
+    movie_data = movieDto.model_dump(exclude={'director_ids'})
+    director_ids = movieDto.director_ids
+
+    directors = []
+    if director_ids:
+        directors = session.exec(select(Director).where(Director.director_id.in_(director_ids))).all()
+        if len(directors) != len(director_ids):
+            raise HTTPException(status_code=404, detail="One or more directors not found")
+
+    movie = Movie(**movie_data)
+    movie.directors = directors 
+
     session.add(movie)
     session.commit()
     session.refresh(movie)
@@ -38,7 +48,9 @@ def create_movie(
 @router.get("", response_model=List[Movie])
 def list_all_movies(session: Session = Depends(get_session)):
     logger.info(f'[list_all_movies] Listing movies...')
-    movies = session.exec(select(Movie)).all()
+    movies = session.exec(
+        select(Movie).options(selectinload(Movie.directors))
+    ).all()
     logger.info(f'[list_all_movies] {len(movies)} found.')
     return movies
 
@@ -136,3 +148,27 @@ def delete_movie(
     session.commit()
     logger.info(f'[delete_movie] Movie with id {movie_id} deleted successfully.')
     return DeleteResponse(message="Movie deleted successfully")
+
+
+@router.post("/{movie_id}/directors/{director_id}", status_code=201, response_model=Movie)
+def add_director_to_movie(
+    movie_id: int,
+    director_id: int,
+    session: Session = Depends(get_session)
+):
+    movie = session.get(Movie, movie_id)
+    if not movie:
+        raise HTTPException(status_code=404, detail="Movie not found")
+
+    director = session.get(Director, director_id)
+    if not director:
+        raise HTTPException(status_code=404, detail="Director not found")
+
+    # Adiciona o diretor à lista de diretores do filme (se já não estiver lá)
+    if director not in movie.directors:
+        movie.directors.append(director)
+        session.add(movie)
+        session.commit()
+        session.refresh(movie)
+
+    return movie

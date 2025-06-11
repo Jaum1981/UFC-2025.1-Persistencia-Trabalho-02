@@ -57,6 +57,7 @@ class MovieCreateDTO(BaseModel):
     rating: str
     synopsis: str
     release_year: Optional[int]
+    director_ids: list[int] = []
     
 class MovieUpdateDTO(BaseModel):
     movie_title: str | None = None
@@ -64,6 +65,7 @@ class MovieUpdateDTO(BaseModel):
     duration: int | None = None
     rating: str | None = None
     synopsis: str | None = None
+    director_ids: list[int] = []
 
 class RoomCreateDTO(BaseModel):
     room_id: Optional[int]
